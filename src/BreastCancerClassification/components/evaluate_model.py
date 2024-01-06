@@ -1,38 +1,30 @@
 import tensorflow as tf
+from tensorflow.keras.preprocessing.image import ImageDataGenerator
 from pathlib import Path
 import mlflow
 import mlflow.keras
 from urllib.parse import urlparse
-from cnnClassifier.entity.config_entity import EvaluationConfig
-from cnnClassifier.utils.common import read_yaml, create_directories, save_json
+from BreastCancerClassification.entity.config_entity import EvaluationConfig
+from BreastCancerClassification.utils.common import save_json
 
 
 class Evaluation:
     def __init__(self, config: EvaluationConfig):
         self.config = config
 
-    def _valid_generator(self):
+    def data_generator(self):
 
-        datagenerator_kwargs = dict(
-            rescale=1. / 255,
-            validation_split=0.30
-        )
-
-        dataflow_kwargs = dict(
-            target_size=self.config.params_image_size[:-1],
+        test_datagen = ImageDataGenerator(rescale=1. / 255)
+        if self.config.class_mode == 1:
+            class_mode = "binary"
+        else:
+            class_mode = 'categorical'
+        self.test_generator = test_datagen.flow_from_directory(
+            self.config.test_data_dir,
+            target_size=tuple(self.config.test_image_size[:2]),
             batch_size=self.config.params_batch_size,
-            interpolation="bilinear"
-        )
-
-        valid_datagenerator = tf.keras.preprocessing.image.ImageDataGenerator(
-            **datagenerator_kwargs
-        )
-
-        self.valid_generator = valid_datagenerator.flow_from_directory(
-            directory=self.config.training_data,
-            subset="validation",
-            shuffle=False,
-            **dataflow_kwargs
+            class_mode=class_mode,
+            shuffle=False
         )
 
     @staticmethod
@@ -40,9 +32,9 @@ class Evaluation:
         return tf.keras.models.load_model(path)
 
     def evaluation(self):
-        self.model = self.load_model(self.config.path_of_model)
-        self._valid_generator()
-        self.score = self.model.evaluate(self.valid_generator)
+        self.model = self.load_model(self.config.model_path)
+        self.data_generator()
+        self.score = self.model.evaluate(self.test_generator)
         self.save_score()
 
     def save_score(self):

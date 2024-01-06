@@ -53,5 +53,6 @@ class EvaluationConfig:
     test_data_dir: Path
     test_image_size: list
     params_batch_size: int
+    class_mode: int
     mlflow_uri: str
 

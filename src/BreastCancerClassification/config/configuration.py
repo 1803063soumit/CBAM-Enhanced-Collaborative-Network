@@ -2,7 +2,7 @@ from pathlib import Path
 from BreastCancerClassification.constants import CONFIG_FILE_PATH, PARAMS_FILE_PATH
 from BreastCancerClassification.utils.common import read_yaml, create_directories
 from BreastCancerClassification.entity.config_entity import DataIngestionConfig, DataSplitConfig, ModelConfig, \
-    TrainingConfig
+    TrainingConfig, EvaluationConfig
 
 
 class ConfigurationManager:
@@ -77,12 +77,13 @@ class ConfigurationManager:
 
         return training_config
 
-    # def get_validation_config(self) -> EvaluationConfig:
-    #     eval_config = EvaluationConfig(
-    #         path_of_model=Path("artifacts/training/model.h5"),
-    #         training_data=Path("artifacts/data_ingestion/Chicken-fecal-images"),
-    #         all_params=self.params,
-    #         params_image_size=self.params.IMAGE_SIZE,
-    #         params_batch_size=self.params.BATCH_SIZE
-    #     )
-    #     return eval_config
+    def get_evaluation_config(self) -> EvaluationConfig:
+        eval_config = EvaluationConfig(all_params=self.params,
+                                       model_path=Path(self.config.models.root_dir) / self.config.models.model,
+                                       test_data_dir=self.data_root_dir / self.config.data_split.root_dir / self.config.data_split.test_dir,
+                                       test_image_size=self.params.models.image_size,
+                                       params_batch_size=self.params.evaluation.batch_size,
+                                       class_mode=self.params.models.num_target_class,
+                                       mlflow_uri="https://dagshub.com/1803063soumit/BreastCancerClassification.mlflow"
+                                       )
+        return eval_config
