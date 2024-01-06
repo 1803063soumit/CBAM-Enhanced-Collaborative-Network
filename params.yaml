@@ -1,0 +1,20 @@
+models:
+  feature_extractor: DenseNet121
+  collaborator: InceptionResNetV2
+  image_size: [224,224,3]
+  num_target_class: 1
+  weights: imagenet
+  optimizer: Adam
+  initial_learning_rate: .0001
+  loss: binary_crossentropy
+  metrics: [ 'accuracy' ]
+data:
+  zoom_factor: all
+  train_test_val_ratio: [70,15,15]
+training:
+  batch_size: 64
+  epochs: 60
+  decay_rate: 0.9
+  decay_epoch: 3
+evaluation:
+  batch_size: 1
