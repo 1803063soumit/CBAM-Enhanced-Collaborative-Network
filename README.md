@@ -24,5 +24,4 @@ The project is developed using the following technologies:
 ## Author
 
 **Author:** Soumit Das
-
-Feel free to reach out to the author for any inquiries or contributions related to the project.
+**Email:** 1803063soumit@gmail.com
