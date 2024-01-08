@@ -75,3 +75,67 @@ stages:
       hash: md5
       md5: fa2402d084f72d1f71d77bebe0837cc7
       size: 264785240
+  training:
+    cmd: python src/BreastCancerClassification/pipeline/training_model.py
+    deps:
+    - path: artifacts/data_split/train
+      hash: md5
+      md5: 6251207c5ee67921f27d3e6c07816d80.dir
+      size: 2992394228
+      nfiles: 5536
+    - path: artifacts/data_split/val
+      hash: md5
+      md5: a8c9e20ba92150df4d45aef602fa4087.dir
+      size: 644913563
+      nfiles: 1187
+    - path: config/config.yaml
+      hash: md5
+      md5: 7d9c7d35f96fe5a6c8d77116ed96acff
+      size: 371
+    - path: models/base_model.h5
+      hash: md5
+      md5: fa2402d084f72d1f71d77bebe0837cc7
+      size: 264785240
+    - path: src/BreastCancerClassification/pipeline/training_model.py
+      hash: md5
+      md5: 9584c8f2abb7e384edead3934a44b58c
+      size: 1040
+    params:
+      params.yaml:
+        training.batch_size: 64
+        training.decay_epoch: 3
+        training.decay_rate: 0.9
+        training.epochs: 60
+    outs:
+    - path: models/trained_model.h5
+      hash: md5
+      md5: d5e50a05097354653baac31a3090d29a
+      size: 732391760
+  evaluation:
+    cmd: python src/BreastCancerClassification/pipeline/evaluate_model.py
+    deps:
+    - path: artifacts/data_split/test
+      hash: md5
+      md5: f765cbb72b46d4df6172fa98f749e64d.dir
+      size: 642127340
+      nfiles: 1186
+    - path: config/config.yaml
+      hash: md5
+      md5: 7d9c7d35f96fe5a6c8d77116ed96acff
+      size: 371
+    - path: models/trained_model.h5
+      hash: md5
+      md5: d5e50a05097354653baac31a3090d29a
+      size: 732391760
+    - path: src/BreastCancerClassification/pipeline/evaluate_model.py
+      hash: md5
+      md5: c1e7e03efbddabdd6750141823bbf29c
+      size: 896
+    params:
+      params.yaml:
+        evaluation.batch_size: 1
+    outs:
+    - path: scores.json
+      hash: md5
+      md5: 0303924cfe2437699726cd094036e4f3
+      size: 74
