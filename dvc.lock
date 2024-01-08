@@ -1,0 +1,77 @@
+schema: '2.0'
+stages:
+  data_ingestion:
+    cmd: python src/BreastCancerClassification/pipeline/data_ingestion.py
+    deps:
+    - path: config/config.yaml
+      hash: md5
+      md5: 7d9c7d35f96fe5a6c8d77116ed96acff
+      size: 371
+    - path: src/BreastCancerClassification/pipeline/data_ingestion.py
+      hash: md5
+      md5: b1f69ce46f01ca1e7c884d3f0009e4dd
+      size: 789
+    outs:
+    - path: artifacts/data_ingestion
+      hash: md5
+      md5: 24aa178082ec92b71305a847e60e104e.dir
+      size: 4279462730
+      nfiles: 7923
+  data_splitting:
+    cmd: python src/BreastCancerClassification/pipeline/data_splitting.py
+    deps:
+    - path: artifacts/data_ingestion
+      hash: md5
+      md5: 24aa178082ec92b71305a847e60e104e.dir
+      size: 4279462730
+      nfiles: 7923
+    - path: config/config.yaml
+      hash: md5
+      md5: 7d9c7d35f96fe5a6c8d77116ed96acff
+      size: 371
+    - path: src/BreastCancerClassification/pipeline/data_splitting.py
+      hash: md5
+      md5: efd2420f2308695d1f2edfa2614f2a4d
+      size: 852
+    params:
+      params.yaml:
+        data.train_test_val_ratio:
+        - 70
+        - 15
+        - 15
+        data.zoom_factor: all
+    outs:
+    - path: artifacts/data_split
+      hash: md5
+      md5: 43b4d1e5a8dc00251bce110c3dd20895.dir
+      size: 4279435131
+      nfiles: 7909
+  prepare_model:
+    cmd: python src/BreastCancerClassification/pipeline/prepare_model.py
+    deps:
+    - path: config/config.yaml
+      hash: md5
+      md5: 7d9c7d35f96fe5a6c8d77116ed96acff
+      size: 371
+    - path: src/BreastCancerClassification/pipeline/prepare_model.py
+      hash: md5
+      md5: f798912c81ebd9676a70f0773b2e2579
+      size: 839
+    params:
+      params.yaml:
+        models.collaborator: InceptionResNetV2
+        models.feature_extractor: DenseNet121
+        models.image_size:
+        - 224
+        - 224
+        - 3
+        models.initial_learning_rate: 0.0001
+        models.loss: binary_crossentropy
+        models.num_target_class: 1
+        models.optimizer: Adam
+        models.weights: imagenet
+    outs:
+    - path: models/base_model.h5
+      hash: md5
+      md5: fa2402d084f72d1f71d77bebe0837cc7
+      size: 264785240

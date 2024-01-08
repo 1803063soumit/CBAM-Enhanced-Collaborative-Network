@@ -42,6 +42,7 @@ class ModelConfig:
 @dataclass(frozen=True)
 class TrainingConfig:
     config_root_dir: Path
+    config_trained_model: Path
     param_batch_size: int
     param_epochs: int
     param_decay_rate: float
@@ -54,5 +55,7 @@ class EvaluationConfig:
     test_image_size: list
     params_batch_size: int
     class_mode: int
-    mlflow_uri: str
+    MLFLOW_TRACKING_URI: str
+    MLFLOW_TRACKING_USERNAME: str
+    MLFLOW_TRACKING_PASSWORD: str
 

@@ -1,0 +1,72 @@
+stages:
+  data_ingestion:
+    cmd: python src/BreastCancerClassification/pipeline/data_ingestion.py
+    deps:
+      - src/BreastCancerClassification/pipeline/data_ingestion.py
+      - config/config.yaml
+    outs:
+      - artifacts/data_ingestion
+
+  data_splitting:
+    cmd: python src/BreastCancerClassification/pipeline/data_splitting.py
+    deps:
+      - src/BreastCancerClassification/pipeline/data_splitting.py
+      - artifacts/data_ingestion
+      - config/config.yaml
+    params:
+      - data.zoom_factor
+      - data.train_test_val_ratio
+    outs:
+      - artifacts/data_split
+
+  prepare_model:
+    cmd: python src/BreastCancerClassification/pipeline/prepare_model.py
+    deps:
+      - src/BreastCancerClassification/pipeline/prepare_model.py
+      - config/config.yaml
+    params:
+      - models.feature_extractor
+      - models.collaborator
+      - models.image_size
+      - models.num_target_class
+      - models.weights
+      - models.optimizer
+      - models.initial_learning_rate
+      - models.loss
+
+    outs:
+      - models/base_model.h5
+
+
+
+  training:
+    cmd: python src/BreastCancerClassification/pipeline/training_model.py
+    deps:
+      - src/BreastCancerClassification/pipeline/training_model.py
+      - config/config.yaml
+      - artifacts/data_split/train
+      - artifacts/data_split/val
+      - models/base_model.h5
+    params:
+      - training.batch_size
+      - training.epochs
+      - training.decay_rate
+      - training.decay_epoch
+    outs:
+      - models/trained_model.h5
+
+
+
+
+  evaluation:
+    cmd: python src/BreastCancerClassification/pipeline/evaluate_model.py
+    deps:
+      - src/BreastCancerClassification/pipeline/evaluate_model.py
+      - config/config.yaml
+      - artifacts/data_split/test
+      - models/trained_model.h5
+    params:
+      - evaluation.batch_size
+    metrics:
+    - scores.json:
+        cache: false

@@ -6,8 +6,8 @@ from tensorflow.keras.layers.experimental import preprocessing
 from tensorflow.keras.optimizers import Adam,SGD
 import tensorflow.keras.backend as K
 from pathlib import Path
-from src.BreastCancerClassification.entity.config_entity import ModelConfig
-from src.BreastCancerClassification import logger
+from BreastCancerClassification.entity.config_entity import ModelConfig
+from BreastCancerClassification import logger
 
 class PrepareModel:
     def __init__(self, config: ModelConfig,augmentation=True):

@@ -107,6 +107,6 @@ class Training:
         )
 
         self.save_model(
-            path=self.model_config.config_model,
+            path=self.training_config.config_trained_model,
             model=self.model
         )

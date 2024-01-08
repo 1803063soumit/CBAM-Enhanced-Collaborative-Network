@@ -1,14 +1,16 @@
 from pathlib import Path
-from BreastCancerClassification.constants import CONFIG_FILE_PATH, PARAMS_FILE_PATH
+from BreastCancerClassification.constants import CONFIG_FILE_PATH, PARAMS_FILE_PATH, MLFLOW_FILE_PATH
 from BreastCancerClassification.utils.common import read_yaml, create_directories
 from BreastCancerClassification.entity.config_entity import DataIngestionConfig, DataSplitConfig, ModelConfig, \
     TrainingConfig, EvaluationConfig
 
 
 class ConfigurationManager:
-    def __init__(self, config_filepath=CONFIG_FILE_PATH, params_filepath=PARAMS_FILE_PATH):
+    def __init__(self, config_filepath=CONFIG_FILE_PATH, params_filepath=PARAMS_FILE_PATH,
+                 mlflow_filepath=MLFLOW_FILE_PATH):
         self.config = read_yaml(config_filepath)
         self.params = read_yaml(params_filepath)
+        self.mlflow = read_yaml(mlflow_filepath)
 
         """
         Create data_root_dir. dataset and Training result will be stored inside it.
@@ -69,6 +71,7 @@ class ConfigurationManager:
         create_directories([self.data_root_dir / config.root_dir])
 
         training_config = TrainingConfig(config_root_dir=self.data_root_dir / config.root_dir,
+                                         config_trained_model=Path(self.config.models.root_dir) / config.trained_model,
                                          param_batch_size=int(param.batch_size),
                                          param_epochs=int(param.epochs),
                                          param_decay_rate=float(param.decay_rate),
@@ -79,11 +82,14 @@ class ConfigurationManager:
 
     def get_evaluation_config(self) -> EvaluationConfig:
         eval_config = EvaluationConfig(all_params=self.params,
-                                       model_path=Path(self.config.models.root_dir) / self.config.models.model,
+                                       model_path=Path(self.config.models.root_dir) / self.config.training.trained_model,
                                        test_data_dir=self.data_root_dir / self.config.data_split.root_dir / self.config.data_split.test_dir,
                                        test_image_size=self.params.models.image_size,
                                        params_batch_size=self.params.evaluation.batch_size,
                                        class_mode=self.params.models.num_target_class,
-                                       mlflow_uri="https://dagshub.com/1803063soumit/BreastCancerClassification.mlflow"
+                                       MLFLOW_TRACKING_URI=str(self.mlflow.MLFLOW_TRACKING_URI),
+                                       MLFLOW_TRACKING_USERNAME=str(self.mlflow.MLFLOW_TRACKING_USERNAME),
+                                       MLFLOW_TRACKING_PASSWORD=str(self.mlflow.MLFLOW_TRACKING_PASSWORD)
+
                                        )
         return eval_config
